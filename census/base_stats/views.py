@@ -11,61 +11,51 @@ def stats(request):
     #          \___ val 2
     #           \__ val 3
     #   
-    # TODO : keep valeus in memory? (cache)
+    # TODO : keep values in memory? (cache)
 
+    context = {} 
+    
     # get field names  
     fields = CensusLearnSql._meta.get_all_field_names()
     fields.remove('age')
     
     # get the distinct values for each field
     for field in fields:
-        f = field
 
-        values = CensusLearnSql.objects.values(field).order_by().distinct()
-        
-        # get count and average age for each valu
+        variables = dict()
+
+        values = CensusLearnSql.objects.values('age',field).order_by()
+        #print values
+       
         for value in values:
-            v = value
+            #print value
 
-            if value[field] is not None:
-
-                kwargs = {
-                    '{0}'.format(field):  value[field] 
-                }
+            if value['age'] is None:
+                continue
+            
+            # variable is already in dictionary
+            if value[field] in variables:
                 
-                ages = CensusLearnSql.objects.values('age').filter(**kwargs)
+                (average,count) = variables[value[field]]
+                average += value['age']
+                count += 1
                 
-                # takes twice as long if obtaining count from query
-                #count = ages.count()
-                
-                count = 0
-                average = 0
-                for age in ages:
-                    count += 1
-                    average += age['age']
-
-                
-                average /= count
-                
-                print field
-                print value[field]
-                print count
-                print average
-
-                
-            # used to make sure that all ages field values are None when country_of_birth is None
-                #ages=dict(ages[0])
-                #for key,value in ages.items():
-                #    print key,value
-                #    if value is None:
-                #          del ages[key]
-                #          print "popped"
+            # new entry
+            else:
+                average = value['age']
+                count = 1
+            
+            variables[value[field]] = average,count
 
         
-        break
-
+        # aggregation complete, now compute averages
+        for key, value in variables.iteritems():
             
-    c = 'hello'
+            variables[key] = value[0]/value[1],value[1]
+            print key,variables[key]
+       
+            
+    c = variables
 
     data=str(c)
     
