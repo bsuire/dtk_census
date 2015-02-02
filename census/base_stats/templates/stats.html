@@ -1,11 +1,28 @@
 <!doctype html>
 <html>
     <head>
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
     </head>
 
     <body>
         
-        <p>{{ data }}</p>
+    <table>
+        {% for name,average,count in citizenship %}
+        <tr class = "content">    
+            <td> {{ name }} </td>
+            <td> {{ count }} </td>
+            <td> {{ average}} </td>
+        </tr>
+        {% endfor %}
+            
+        {% for name,average,count in education %}
+        <tr class = "content">    
+            <td> {{ name }} </td>
+            <td> {{ count }} </td>
+            <td> {{ average}} </td>
+        </tr>
+        {% endfor %}
+    </table>
 
     </body>
-    </html> 
+</html> 
