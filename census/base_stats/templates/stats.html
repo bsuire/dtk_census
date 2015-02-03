@@ -5,24 +5,34 @@
     </head>
 
     <body>
+        <input type="checkbox" id="myCheck" onclick="getData()">
         
-    <table>
-        {% for name,average,count in citizenship %}
-        <tr class = "content">    
-            <td> {{ name }} </td>
-            <td> {{ count }} </td>
-            <td> {{ average}} </td>
-        </tr>
-        {% endfor %}
+        {% verbatim %}  
+        <div ng-app="" ng-controller="dataController"> 
             
-        {% for name,average,count in education %}
-        <tr class = "content">    
-            <td> {{ name }} </td>
-            <td> {{ count }} </td>
-            <td> {{ average}} </td>
-        </tr>
-        {% endfor %}
-    </table>
 
+            <table> 
+                <tr ng-repeat="entry in census | orderBy : '-count'">                    
+                    <td> {{ entry.name }} </td>
+                    <td> {{ entry.count }} </td> 
+                    <td> {{ entry.age }} </td>
+                </tr>
+            </table> 
+        </div>
+        {% endverbatim %}
+
+    <script>
+        function dataController($scope,$http) {
+                $http.get("http://127.0.0.1:8000/data/birth_country")
+                    .success(function(response) {$scope.census = response;});
+                }
+
+        // On mouse-over, execute myFunction
+        function getData() {
+        
+
+            //document.getElementById("myCheck").c; // Click on the checkbox
+        }
+    </script>
     </body>
 </html> 
