@@ -1,34 +1,68 @@
 <!doctype html>
 <html>
     <head>
+        <title>CensusApp</title>
         <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+        <style>
+            body { font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; }
+            body { background: #F0F0F0 } 
+            .main_container {  } 
+            .table_container {  }
+
+            form { margin: 20px 0 0 50px; }  
+            table { width = 50%; margin: 5px auto; text-align:center; font-size:100%; }
+            
+            tr  { width = 100% ; }
+            
+            .name { width: 60%; padding: 5px;}  
+            .number { width: 20%; padding: 5px;}  
+            
+            .align-right { padding-right: 25px; text-align:right;}
+            
+
+            tr:nth-child(even) {background: #E0E0E0}
+            tr:nth-child(odd) {background: #D0D0D0}
+            tr.table_headers {background: #707070; color: #F0F0F0; }
+            .error { color:red } 
+        </style>
     </head>
 
     <body>
         
-        <div ng-app="" ng-controller="dataController"> 
-        
-            <form>
-                <!-- Choices should be dynamic  --> 
-                <!-- <select ng-model="selection" ng-options="option.value as option.text for option in options"> -->
-                <select required id="select_var">
-                    {% for var,var_pretty in variables %} 
-                    <option value="{{ var }}">{{ var_pretty }}</option>
-                    {% endfor %}
-                </select>
-                
-                <button type="button"  ng-click="click()"> Go! </button>
-            </form>
+        <div class="main_container" ng-app="" ng-controller="dataController"> 
+            
+            <div class="form_container"> 
+                <form>
+                    <select required id="select_var">
+     
+                        {% for var,var_pretty in variables %} 
+     
+                        <option value="{{ var }}">{{ var_pretty }}</option>
+     
+                        {% endfor %}
+     
+                    </select>
+                    
+                    <button type="button"  ng-click="click()"> Go! </button>
+                </form>
+            </div>
 
-
-        {% verbatim %}  
-            <table> 
-                <tr ng-repeat="entry in census | orderBy : '-count'">                    
-                    <td> {{ entry.name }} </td>
-                    <td> {{ entry.count }} </td> 
-                    <td> {{ entry.age }} </td>
-                </tr>
-            </table> 
+            {% verbatim %}
+    
+            <div class="table_container">
+                <table> 
+                    <tr class = "table_headers">    
+                        <td class="name"><b> Value </b></td>
+                        <td class="number"><b> Count </b></td> 
+                        <td class="number"><b> Average Age </b></td> 
+                    </tr>
+                    <tr ng-repeat="entry in census | orderBy : '-count'">                    
+                        <td class="name"> {{ entry.name }} </td>
+                        <td class="number align-right"> {{ entry.count }} </td> 
+                        <td class="number"> {{ entry.age }} </td>
+                    </tr>
+                </table> 
+            </div>
         {% endverbatim %}
         </div>
     <script>
@@ -41,8 +75,6 @@
                 var variable = select.options[select.selectedIndex].value;
 
                 console.log(variable)    
-
-                // $http.defaults.useXDomain = true;
                 
                 var response = $http.get("http://127.0.0.1:8000/data/"+ variable)
 
@@ -50,22 +82,12 @@
                     
                     $scope.census = response;
                 });
-
                 //response.error(function(response) {
                 //    alert("Error! Data could not be loaded.");
                 //});
-
             };
 
         }
-
-
-
-
-        // On mouse-over, execute myFunction
-        //function getData() {
-            //document.getElementById("myCheck").c; // Click on the checkbox
-        //}
     </script>
     </body>
 </html> 
