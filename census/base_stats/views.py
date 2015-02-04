@@ -8,6 +8,23 @@ def home(request):
 
     context = {} 
     
+    # get field names  
+    fields = CensusLearnSql._meta.get_all_field_names()
+    fields.remove('age')
+    fields.remove('id')
+    
+    # make a user friendly copy of the field names
+    fields_pretty = []
+
+    for field in fields:
+
+        field_pretty = field.replace("_"," ").title()
+        fields_pretty.append(field_pretty)
+    
+    fields = zip(fields,fields_pretty)
+
+    context['variables'] = fields
+
     return render(request,'stats.html',context)
 
 
@@ -34,7 +51,11 @@ def get_base_stats(field):
     values = CensusLearnSql.objects.values('age',field)
    
     for value in values:
-
+        
+        # skip this entry if no age is provided
+        # (typically that means the value is also None, 
+        # but it may be more accurate to keep two separate counts
+        # one for the number of entries, another to compute the average)
         if value['age'] is None:
             continue
         
@@ -71,11 +92,6 @@ def get_base_stats(field):
     return var_list
 
 ## get all fields....
-#    # get field names  
-#    fields = CensusLearnSql._meta.get_all_field_names()
-#    fields.remove('age')
-#    fields.remove('id') 
-#
 #    # get the distinct values for each field
 #    for x,field in enumerate(fields):
 #    

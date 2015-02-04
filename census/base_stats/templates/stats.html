@@ -6,25 +6,22 @@
 
     <body>
         
-        {% verbatim %}  
         <div ng-app="" ng-controller="dataController"> 
         
             <form>
                 <!-- Choices should be dynamic  --> 
                 <!-- <select ng-model="selection" ng-options="option.value as option.text for option in options"> -->
                 <select required id="select_var">
-                    <option value="birth_country">Birth Country</option>
-                    <option value="education">Education</option>
-                    <option value="class_of_worker">Class of Worker</option>
-                    <option value="sex">Sex</option>
+                    {% for var,var_pretty in variables %} 
+                    <option value="{{ var }}">{{ var_pretty }}</option>
+                    {% endfor %}
                 </select>
                 
                 <button type="button"  ng-click="click()"> Go! </button>
-                                
             </form>
 
 
-
+        {% verbatim %}  
             <table> 
                 <tr ng-repeat="entry in census | orderBy : '-count'">                    
                     <td> {{ entry.name }} </td>
@@ -32,9 +29,8 @@
                     <td> {{ entry.age }} </td>
                 </tr>
             </table> 
-        </div>
         {% endverbatim %}
-
+        </div>
     <script>
                         
          function dataController($scope,$http) {
