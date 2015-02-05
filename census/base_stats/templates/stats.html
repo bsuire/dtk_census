@@ -41,13 +41,18 @@
                     <td class="number"><b> Count </b></td> 
                     <td class="number"><b> Average Age </b></td> 
                 </tr>
-                <tr ng-repeat="entry in census | orderBy : '-count'">                    
+                <tr ng-repeat="entry in census.data">                    
                     <td class="name"> {{ entry.name }} </td>
-                    <td class="number align-right"> {{ entry.count }} </td> 
+                    <td class="number align-right"> {{ entry.count | number : fractionSize }} </td> 
                     <td class="number"> {{ entry.age }} </td>
                 </tr>
             </table> 
+            <div>
+                <p> Number of <b>values</b> clipped: {{ census.meta.values_clipped }} </p>  
+                <p> Number of <b>rows</b> clipped: {{ census.meta.rows_clipped }} </p>  
+            </div>
             {% endverbatim %}
+
         </div>
         <script>
                         
