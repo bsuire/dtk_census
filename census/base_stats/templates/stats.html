@@ -61,8 +61,8 @@
         </div>
         <script>
 
-            var current_variable = "";
-                        
+            var downloaded = {}            
+
             function dataController($scope,$http) {
 
                 $scope.click = function() {
@@ -71,12 +71,13 @@
                     var select = document.getElementById("select_var");   
                     var variable = select.options[select.selectedIndex].value;
                     
-                    // prevent unecessary request if selected variable hasn't changed
-                    if (variable === current_variable) return;
-                    
-                    // update current variable
-                    current_variable = variable;
-                    
+                    // look for variable in "cache"
+                    if (variable in downloaded){
+                        
+                        $scope.census = downloaded[variable];
+                        return
+                    }
+
                     // request variable data from server
                     var response = $http.get("http://127.0.0.1:8000/data/"+ variable)
 
@@ -84,6 +85,7 @@
                         
                         // update controller data if response if successful    
                         $scope.census = response;
+                        downloaded[variable] = response
                     });
                 };
             }
