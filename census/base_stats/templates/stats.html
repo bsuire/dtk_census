@@ -48,7 +48,7 @@
                     <tr ng-repeat="entry in census.data">                    
                         <td class="name"> {{ entry.name }} </td>
                         <td class="number align-right"> {{ entry.count | number : fractionSize }} </td> 
-                        <td class="number"> {{ entry.age }} </td>
+                        <td class="number"> {{ entry.age / 10 }} </td>
                     </tr>
                 </table> 
             </div>

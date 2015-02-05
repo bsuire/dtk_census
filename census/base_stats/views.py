@@ -86,7 +86,7 @@ def stats(request,field): # note: fields and variables are used interchangeably
         entry = {}   
         entry["name"] = key
         entry["count"] = value[1]
-        entry["age"] = value[0]/value[1]
+        entry["age"] = 10 * value[0] / value[1]
         
         var_list.append(entry) 
     
