@@ -2,27 +2,13 @@
 <html>
     <head>
         <title>CensusApp</title>
+        {% load staticfiles %}
         <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
-        <style>
-            body { font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; }
-            body { background: #F0F0F0; margin: 15px 3%;} 
-
-            .input-container { float:left; width:28%; text-align: center;}
-            .data-container { float:left; width:50%; }
-            .meta-container { float:left;  width:16%; font-size:90%; }
-             
-            table { text-align:center; }
-            tr:nth-child(even) {background: #E0E0E0}
-            tr:nth-child(odd) {background: #D0D0D0}
-            tr.table_headers {background: #707070; color: #F0F0F0; }
-            td.name { width: 60%; padding: 5px;}  
-            td.number { width: 20%; padding: 5px;}  
-            td.align-right { padding-right: 25px; text-align:right;}
-        </style>
+        <script src="{% static 'dataController.js' %}"></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
     </head>
 
     <body>
-        
         <div  ng-app="" ng-controller="dataController"> 
             <div class = "input-container">             
                 <form>
@@ -57,38 +43,6 @@
                 <p> Number of <b>rows</b> clipped:<br><b>{{ census.meta.rows_clipped | number : fractionSize }}</b></p>  
             </div>
             {% endverbatim %}
-
         </div>
-        <script>
-
-            var downloaded = {}            
-
-            function dataController($scope,$http) {
-
-                $scope.click = function() {
-                
-                    // on click, get selected variable from select/dropdown menu 
-                    var select = document.getElementById("select_var");   
-                    var variable = select.options[select.selectedIndex].value;
-                    
-                    // look for variable in "cache"
-                    if (variable in downloaded){
-                        
-                        $scope.census = downloaded[variable];
-                        return
-                    }
-
-                    // request variable data from server
-                    var response = $http.get("http://127.0.0.1:8000/data/"+ variable)
-
-                    response.success(function(response) {
-                        
-                        // update controller data if response if successful    
-                        $scope.census = response;
-                        downloaded[variable] = response
-                    });
-                };
-            }
-        </script>
     </body>
 </html> 
