@@ -3,11 +3,12 @@ from django.http import HttpResponse
 from models import CensusLearnSql
 import json
 
+MAX_NB_VALUES = 100
+
 ################################################################
 # home(request): 
 # ----- RETURNS UI (html) with dropdown select button which is 
 # ----- dynamically populated with table's field names
-################################################################
 
 def home(request):
 
@@ -38,11 +39,10 @@ def home(request):
 # stats(request,field): 
 # ----- Acts as an API for AngularJS http/data requests.
 # ----- Gets all the field_value,age pairs from the database.
-# ----- Computes the number of occurences of each value,
-# ----- as well as the average age of people corresponding.
-# ----- RETURNS a JSON containing a list of dictionaries 
-# ----- with keys: field_value, count, average_age.
-################################################################
+# ----- Computes the count and average age for each value.
+# ----- RETURNS a JSON containing the name, count, & average_age 
+# ----- for the 100 most frequent value, sorted in decreasing order
+# ----- + the nb of values and rows clipped
 
 def stats(request,field): # note: fields and variables are used interchangeably 
 
@@ -58,8 +58,6 @@ def stats(request,field): # note: fields and variables are used interchangeably
     for value in values:
         
         # skip this entry if no age is provided
-        # (typically that means the variable's value is also None,
-        # but I have not verified this assumption)
         if value['age'] is None:
             continue
         
@@ -79,14 +77,12 @@ def stats(request,field): # note: fields and variables are used interchangeably
         
         values_aggreg[value[field]] = age_sum,count
     
-
     # aggregation complete, now compute averages
-    
     var_list = []
     
     for key, value in values_aggreg.iteritems():
        
-        # saving as dictionary so that fields can be accessed as objects in JS
+        # saving in dictionary so that fields can be accessed as objects in JS
         entry = {}   
         entry["name"] = key
         entry["count"] = value[1]
@@ -104,15 +100,11 @@ def stats(request,field): # note: fields and variables are used interchangeably
     nb_rows_shown = aggregate_count(var_list)
     nb_rows_hidden = nb_rows_valid - nb_rows_shown
     
+    # prepare response
     meta = {}
     meta["values_clipped"] = nb_values_hidden
     meta["rows_clipped"] = nb_rows_hidden
 
-    print "Nb of values that were clipped out: " + str(nb_values_hidden)
-    print "Nb of rows that were clipped out: " + str(nb_rows_hidden)
-    print "Total number of VALID rows: " + str(nb_rows_valid)
-    print "Sanity check: nb_shown + nb_hidden = ? " + str(nb_rows_shown + nb_rows_hidden)
-    
     response_data = {} 
     response_data["meta"] = meta
     response_data["data"] = var_list
@@ -121,31 +113,34 @@ def stats(request,field): # note: fields and variables are used interchangeably
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 
-def clip(list_rows):
+################################################################
+#            Helper functions
+################################################################
+
+# clip(list_rows): 
+# ----- Clips list of values if len(list) > 100
+# ----- RETURNS the number of values that were clipped
+
+def clip(list_values):
     
-    nb_rows = len(list_rows)
+    nb_values = len(list_values)
     
-    if nb_rows <= 100:
+    if nb_values <= MAX_NB_VALUES:
         return 0
 
     else:
-        del list_rows[100:]
-        return nb_rows - 100
+        del list_values[ MAX_NB_VALUES : ]
+        return nb_values - MAX_NB_VALUES
 
+# aggregate_count(list_rows): 
+# ----- RETURNS the total count value for the entire list
 
-def aggregate_count(list_rows):
+def aggregate_count(list_values):
     
     count_total = 0
     
-    for row in list_rows:
-        count_total += row["count"]
+    for val in list_values:
+        count_total += val["count"]
 
     return count_total
-
-
-
-
-
-
-
 
